@@ -1,0 +1,51 @@
+/* RColorBrewer::brewer.pal(8, "Dark2") */
+.reveal .accent-one {
+  color: #1B9E77 !important; 
+}
+.reveal .accent-two { 
+  color: #D95F02 !important; 
+}
+.reveal .accent-three { 
+  color: #7570B3 !important; 
+}
+.reveal .accent-four { 
+  color: #E7298A !important; 
+}
+.reveal .accent-five { 
+  color: #66A61E !important; 
+}
+.reveal .accent-six { 
+  color: #E6AB02 !important; 
+}
+.reveal .accent-seven { 
+  color: #A6761D !important; 
+}
+.reveal .grey { 
+  color: #666666 !important; 
+}
+.reveal .white-text {
+  color: #ffffff !important;
+}
+.reveal .red-text {
+  color: red !important;
+}
+.reveal .black-text {
+  color: black !important;
+}
+
+
+.reveal .text-center {
+  text-align: center;
+}
+
+.reveal .text-right {
+  text-align: right;
+}
+
+.reveal .text-small {
+  font-size: .7em;
+}
+
+.reveal .text-tiny {
+  font-size: .5em;
+}
