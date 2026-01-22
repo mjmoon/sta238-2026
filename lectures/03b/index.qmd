@@ -1,0 +1,1161 @@
+---
+title: "Week 3: Statistical Modelling and Approximations"
+subtitle: "STA238: Probability, Statistics, and Data Analysis II"
+author: "Michael Jongho Moon"
+institute: "Week of January 22, 2026"
+date: ""
+format:
+  revealjs:
+    width: 1280
+    height: 720
+    theme: [default, ../theme.scss]
+    css: "style.css"
+    chalkboard: true
+    footer: |
+      &copy; 2026. Michael J. Moon. University of Toronto. 
+      
+      Sharing, posting, selling, or using this material
+      outside of your personal use in this course is
+      <strong>NOT</strong> permitted under any circumstances.
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+set.seed(238)
+mytheme <- theme(
+  title = element_text(size = 26),
+  axis.text = element_text(size = 24),
+  axis.title = element_text(size = 26)
+)
+cmap <- palette.colors(9, "Accent")
+speed_of_light <- morley |> pull(Speed)
+```
+
+## Example: Speed of light (continued) {.center}
+
+::::::: {.columns}
+:::::: {.column}
+
+```{r}
+# speed of light
+b <- (24 * sqrt(pi))^(1/3) * sd(speed_of_light) * length(speed_of_light)^(-1/3)
+ggplot() +
+  theme_classic() +
+  geom_histogram(
+    aes(x = speed_of_light, y = after_stat(density)),
+    binwidth = round(b)
+  ) +
+  labs(x = "Speed of light - 299 000 (km/s)",
+       y = "Density") +
+  mytheme
+```
+
+::::::
+:::::: {.column}
+
++    We modeled the measured speed of light as ________________ realizations from
+an ______________ distribution.
++    That is, we modeled them as realizations of a **random sample**.
+
+::::::
+:::::::
+
+## Is the speed of light data set a random sample? {.center}
+
+:::::::: {.columns}
+::::::: {.column width="45%"}
+
+Do they follow the same distribution?
+
+:::::::
+::::::: {.column width="10%"}
+:::::::
+::::::: {.column width="45%"}
+
+Are the observations independent?
+
+:::::::
+::::::::
+
+
+## Is the speed of light data set a random sample? {.center}
+
+:::::::: {.columns}
+::::::: {.column width="45%"}
+
+Do they follow the same distribution?
+
+:::::::
+::::::: {.column width="10%"}
+:::::::
+::::::: {.column width="45%"}
+
+Are the observations independent?
+
+:::::::
+::::::::
+
+:::::::: {.columns}
+::::::: {.column width="45%"}
+
++  The measurements were collected under the same experimental conditions.
+
++  They were estimates for a one "true" value.
+
+:::::::
+::::::: {.column width="10%"}
+:::::::
+::::::: {.column width="45%"}
+
++  Physical independence -- the events associated with experiments have no
+physical connections -- implies stochastic independence.
+
++  When collecting the speed of light data, Michelson ensured the measurements
+had no influence to each other.
+
+:::::::
+::::::::
+
+## Statistical model for repeated measurements (univariate) {.half-title .center}
+
+:::: {.column width="45%"}
+
++  The probability distribution $F$ is the **statistical model**.
++  We assume that there exists one _true distribution_.<sup>&#8224;</sup>
+
+::: {.in-column-footer}
+
+<sup>&#8224;</sup>At least until we talk about Bayesian estimation.
+
+:::
+
+::::
+
+
+::::: {.full-height .right}
+
+<br />
+
+::: {.definition}
+
+A data set consisting of repeated measurements $x_1$, $x_2$, ..., $x_n$ 
+of the same quantity is modelled as the realization of a random sample
+$X_1$, $X_2$, ..., $X_n$.
+
+The model may include a partial specification of the probability
+distribution of each $X_i$.
+:::
+
+:::::
+
+## Example: A statistical model for the speed of light measurements
+
+::::::: {.columns}
+:::::: {.column}
+
+### What we know/believe ...
+
++  The speed of light in a vacuum is constant.
++  The observed randomness is due to measurement errors.
++  The experiment was carefully designed to avoid any systematic error.
++  The error is likely to be of a large magnitude.
+
+::::::
+:::::: {.column}
+
+### How we may model our knowledge/belief ...
+
++  The observed values are centred around the speed of light in a vacuum.
++  The expectation of the error is 0.
++  The errors have a finite variance.
++  The distribution of the error is symmetric around 0 and tapers off in both
+ways.
+
+::::::
+:::::::
+
+::: {.text-center .note}
+We can model $\text{Measurement}=\text{True speed}+\text{Error}$,
+which implies that  
+$\mathbb{E}(\text{Measurement})=\text{True speed}$
+and $\text{Var}(\text{Measurement})=\text{Var}(\text{Error})<\infty$.
+:::
+
+## Example: The true speed of light 
+
+::::::: {.columns}
+:::::: {.column}
+
+```{r}
+# speed of light
+ggplot() +
+  theme_classic() +
+  geom_histogram(
+    aes(x = speed_of_light, y = after_stat(density)),
+    binwidth = round(b), fill = "lightgrey"
+  ) +
+  # geom_function(fun = dnorm, args = list(mean = 800, sd = 100),
+  #               alpha = .8) +
+  # geom_function(fun = dnorm, args = list(mean = 900, sd = 120),
+  #               alpha = .8) +
+  # geom_function(fun = dnorm, args = list(mean = 850, sd = 50),
+  #               alpha = .8) +
+  # geom_function(fun = dnorm, args = list(mean = 840, sd = 75),
+  #               alpha = .8) +
+  labs(x = "Speed of light - 299 000 (km/s)",
+       y = "Density") +
+  mytheme
+```
+
+
+::::::
+:::::: {.column}
+
+### What model would be a good candidate?
+
++  We want a distribution that is symmetric around 0 and tapers off in both
+ways.
++  A __________________ distribution is good candidate and is often used to
+model measurement errors.
+
+::::::
+:::::::
+
+## Example: The true speed of light 
+
+::::::: {.columns}
+:::::: {.column}
+
+```{r}
+# speed of light
+ggplot() +
+  theme_classic() +
+  geom_histogram(
+    aes(x = speed_of_light, y = after_stat(density)),
+    binwidth = round(b), fill = "lightgrey"
+  ) +
+  geom_function(fun = dnorm, args = list(mean = 800, sd = 100),
+                alpha = .8, color = "magenta") +
+  geom_function(fun = dnorm, args = list(mean = 900, sd = 120),
+                alpha = .8, color = "magenta") +
+  geom_function(fun = dnorm, args = list(mean = 850, sd = 50),
+                alpha = .8, color = "magenta") +
+  geom_function(fun = dnorm, args = list(mean = 840, sd = 75),
+                alpha = .8, color = "magenta") +
+  labs(x = "Speed of light - 299 000 (km/s)",
+       y = "Density") +
+  mytheme
+```
+
+
+::::::
+:::::: {.column}
+
+### We _partially_ specified the model by now.
+
+
++  We started from $X_i\sim F_i$.
++  We assumed _____________________, $X_1,X_2,\ldots, X_n\sim F$
++  We now assumed $X_1,X_2,\ldots, X_n\sim N(c + 0, \sigma^2)$, where $c$ is the
+true speed of light.
+
+
+::::::
+:::::::
+
+## Example: The true speed of light 
+
+::::::: {.columns}
+:::::: {.column}
+
+```{r}
+# speed of light
+ggplot() +
+  theme_classic() +
+  geom_histogram(
+    aes(x = speed_of_light, y = after_stat(density)),
+    binwidth = round(b), fill = "lightgrey"
+  ) +
+  geom_function(fun = dnorm, args = list(mean = 800, sd = 100),
+                alpha = .8, color = "magenta") +
+  geom_function(fun = dnorm, args = list(mean = 900, sd = 120),
+                alpha = .8, color = "magenta") +
+  geom_function(fun = dnorm, args = list(mean = 850, sd = 50),
+                alpha = .8, color = "magenta") +
+  geom_function(fun = dnorm, args = list(mean = 840, sd = 75),
+                alpha = .8, color = "magenta") +
+  labs(x = "Speed of light - 299 000 (km/s)",
+       y = "Density") +
+  mytheme
+```
+
+
+::::::
+:::::: {.column}
+
+### We _partially_ specified the model by now.
+
++    The model suggests a family of distributions as candidates for the true distribution.
++    Specifying the **model parameter(s)**, $\theta$ fully specifies the model.
+    +    In this case, $\theta=(c, \sigma^2)$.
++    The partially spcified model is called a **parametric model**.
+
+$$\left\{F_\theta:\theta\in\Theta\right\}$$
+
+::::::
+:::::::
+
+## Example: Software reliability data
+
+:::::: {.columns}
+::::: {.column .in-column-tiny}
+
+```{r}
+software <- scan("data/software.txt")
+kable(matrix(software, ncol = 8),
+      caption = "Time between successive failures in CPU seconds by Musa et al, 1987.") |>
+  kable_paper(full_width = F)
+```
+
+::: {.in-column-footer}
+See Section 15.3 of Dekking _et al._ for details.
+:::
+:::::
+::::: {.column}
+
+For each failure in a certain software, the length of the interval from the 
+previous, or the start of the experiment, is recorded. 
+
+What is a reasonable model?
+
+::: {.fragment}
+
++  Times are nonnegative.
++  We may assume software failures are a _________ process.
+    +  Failures are mutually independent.
+    +  Failures can occur at any moment with the same likelihood.
+
+:::
+
+:::::
+::::::
+
+## Example: Software reliability data
+
+:::::: {.columns}
+::::: {.column}
+
+```{r}
+ggplot() +
+  theme_minimal() +
+  geom_histogram(aes(x = software, y = after_stat(density)), bins = 27, fill = "darkgrey") +
+  geom_function(fun = dexp, args = list(rate = 1 / mean(software)), 
+                color = "maroon", linetype = "dotted", linewidth = 2) +
+  labs(x = "Time between failures (CPU seconds)", y = NULL,
+       title = "An exponential function seems like\na good candidate for the density function.") +
+  mytheme +
+  theme(axis.text.y = element_blank())
+```
+
+
+:::::
+::::: {.column}
+
+The failure time can be modeled with ______________ distribution.
+
+The unknown parameter to estimate is ____________.
+
+:::::
+::::::
+
+
+
+## Exercises
+
+What is a reasonable candidate distribution to model each of the following data?
+Assume they are random samples. What simplifying assumptions are you making about
+the context of the data?
+
+:::: {.column width="45%" .in-column-small}
+
++  The lifetime of a battery under continuous use.
++  The number of wins by the Leafs out of 82 regular season games.
++  Average class grades of _Advanced Functions_ from Ontario high schools.
+
+::::
+
+# Estimating features of the model distribution {.center}
+
+## Example: Rolling a die {.center}
+
+## Example: The true speed of light {.center}
+
+::::::: {.columns}
+:::::: {.column}
+
+```{r}
+# speed of light
+ggplot() +
+  theme_classic() +
+  geom_histogram(
+    aes(x = speed_of_light, y = after_stat(density)),
+    binwidth = round(b), fill = "lightgrey"
+  ) +
+  # geom_function(fun = dnorm, args = list(mean = 800, sd = 100),
+  #               alpha = .8) +
+  # geom_function(fun = dnorm, args = list(mean = 900, sd = 120),
+  #               alpha = .8) +
+  # geom_function(fun = dnorm, args = list(mean = 850, sd = 50),
+  #               alpha = .8) +
+  # geom_function(fun = dnorm, args = list(mean = 840, sd = 75),
+  #               alpha = .8) +
+  labs(x = "Speed of light - 299 000 (km/s)",
+       y = "Density") +
+  mytheme
+```
+
+
+::::::
+:::::: {.column}
+
+Based on the model, how can we estimate the _true_ speed of light in a vacuum?
+
+$$
+\begin{align*}
+&\mathbb{E}(\text{Measurement}) \\
+=&\ \mathbb{E}(\text{True speed}) + \mathbb{E}(\text{Error}) \\
+=&\ \text{True speed} + 0\\
+\end{align*}
+$$
+
+_Estimate the mean of the model distribution!_
+
+
+::::::
+:::::::
+
+## Example: The true speed of light 
+
+::::::: {.columns}
+:::::: {.column}
+
+```{r}
+# speed of light
+ggplot() +
+  theme_classic() +
+  geom_histogram(
+    aes(x = speed_of_light, y = after_stat(density)),
+    binwidth = round(b), fill = "lightgrey"
+  ) +
+  # geom_function(fun = dnorm, args = list(mean = 800, sd = 100),
+  #               alpha = .8) +
+  # geom_function(fun = dnorm, args = list(mean = 900, sd = 120),
+  #               alpha = .8) +
+  # geom_function(fun = dnorm, args = list(mean = 850, sd = 50),
+  #               alpha = .8) +
+  # geom_function(fun = dnorm, args = list(mean = 840, sd = 75),
+  #               alpha = .8) +
+  labs(x = "Speed of light - 299 000 (km/s)",
+       y = "Density") +
+  mytheme
+```
+
+
+::::::
+:::::: {.column}
+
+**Goal:** Estimate the mean of the model distribution.
+
+_What would be a good guess based on the observations?_
+
+::::::
+:::::::
+
+## Example: The true speed of light 
+
+::::::: {.columns}
+:::::: {.column}
+
+```{r}
+# speed of light
+ggplot() +
+  theme_classic() +
+  geom_histogram(
+    aes(x = speed_of_light, y = after_stat(density)),
+    binwidth = round(b), fill = "lightgrey"
+  ) +
+  labs(x = "Speed of light - 299 000 (km/s)",
+       y = "Density") +
+  mytheme
+```
+
+
+::::::
+:::::: {.column}
+
+**Goal:** Estimate the mean of the model distribution.
+
+_What would be a good guess based on the observations?_
+
+:::: {.columns}
+::: {.column width="45%"}
+
+_The true speed, $c$_
+
+is a **parameter**, a unknown quantity of the population.
+
+:::
+::: {.column width="45%"}
+
+_Estimate based on the observation_
+
+is a **sample statistic**, a quantity computed from observed data.
+
+:::
+::::
+
+::::::
+:::::::
+
+## Sample statistic {.half-title .center}
+
+::::: {.column width="45%"}
+
++  With a model adequately representing the data, sample statistics reflect
+features of the distribution.
+
++  Note that a sample statistic is a random variable.
+
+:::::
+
+::::: {.full-height .right}
+
+<br />
+
+::: {.definition}
+
+Consider a random sample $X_1$, $X_2$, ..., $X_n$. 
+A **sample statistic** is a function of the random sample,
+
+$$h(X_1, X_2,\ldots,X_n).$$
+
+:::
+:::::
+
+## Example: The true speed of light 
+
+::::::: {.columns}
+:::::: {.column}
+
+```{r}
+# speed of light
+ggplot() +
+  theme_classic() +
+  geom_histogram(
+    aes(x = speed_of_light, y = after_stat(density)),
+    binwidth = round(b), fill = "lightgrey"
+  ) +
+  labs(x = "Speed of light - 299 000 (km/s)",
+       y = "Density") +
+  mytheme
+```
+
+
+::::::
+:::::: {.column}
+
+
+::: {.r-fit-text}
+
+So...which  
+sample statistic?
+
+:::
+
+
+::::::
+:::::::
+
+
+## The Weak Law of Large Numbers
+
+::::::: {.columns}
+:::::: {.column}
+::: {.definition}
+
+Consider a sequence of independent random variables $X_1$, $X_2$, ...,
+with each having the same mean $\mu<\infty$ and the same variance 
+$\sigma^2<\infty$. Then for all $\varepsilon>0$,
+
+$$\lim_{n\to\infty}P(|\bar{X}_n-\mu|\ge\varepsilon)=0,$$
+where $\bar{X}_n=\left.\sum_{i=1}^nX_i\right/n$. In other words,
+
+$$\bar{X}_n\overset{p}{\rightarrow}\mu\quad\text{as}\quad n\rightarrow\infty.$$
+
+:::
+::::::
+:::::: {.column}
+
+_Proof:_
+
+
+::::::
+::::::: 
+
+## The Weak Law of Large Numbers
+
+::::::: {.columns}
+:::::: {.column}
+::: {.definition}
+
+Consider a sequence of independent random variables $X_1$, $X_2$, ...,
+with each having the same mean $\mu<\infty$ and the same variance 
+$\sigma^2<\infty$. Then for all $\varepsilon>0$,
+
+$$\lim_{n\to\infty}P(|\bar{X}_n-\mu|\ge\varepsilon)=0,$$
+where $\bar{X}_n=\left.\sum_{i=1}^nX_i\right/n$. In other words,
+
+$$\bar{X}_n\overset{p}{\rightarrow}\mu\quad\text{as}\quad n\rightarrow\infty.$$
+
+:::
+::::::
+:::::: {.column}
+
+_Proof:_
+
+::: {.note}
+
+Recall Chebyshevy's inequality states that
+
+$$P(|Y-\mathbb{E}(Y)|\ge \varepsilon)\le\frac{1}{\varepsilon^2}\text{Var}(Y).$$
+
+for a random variable $Y$ with $\mathbb{E}(Y)<\infty$
+and $\text{Var}(Y)<\infty$, and any constant $\varepsilon>0$.
+
+:::
+
+::::::
+::::::: 
+
+## The Weak Law of Large Numbers
+
+::::::: {.columns}
+:::::: {.column}
+::: {.definition}
+
+Consider a sequence of independent random variables $X_1$, $X_2$, ...,
+with each having the same mean $\mu<\infty$ and the same variance 
+$\sigma^2<\infty$. Then for all $\varepsilon>0$,
+
+$$\lim_{n\to\infty}P(|\bar{X}_n-\mu|\ge\varepsilon)=0,$$
+where $\bar{X}_n=\left.\sum_{i=1}^nX_i\right/n$. In other words,
+
+$$\bar{X}_n\overset{p}{\rightarrow}\mu\quad\text{as}\quad n\rightarrow\infty.$$
+
+:::
+::::::
+:::::: {.column}
+
++  A random sample is a sequence of independent and identically distributed 
+random variables.
+
++  The **sample mean** of a random sample estimates the expectation 
+of the model distribution.
+
++  The sample mean is an example of a **sample statistic**.
+
+::::::
+::::::: 
+
+
+## Example: The true speed of light 
+
+::::::: {.columns}
+:::::: {.column}
+
+```{r}
+# speed of light
+ggplot() +
+  theme_classic() +
+  geom_histogram(
+    aes(x = speed_of_light, y = after_stat(density)),
+    binwidth = round(b), fill = "lightgrey"
+  ) +
+  geom_vline(xintercept = mean(speed_of_light), color = cmap[1], linewidth = 2) +
+  geom_vline(xintercept = 792.458, color = cmap[3], linewidth = 2) +
+  labs(x = "Speed of light - 299 000 (km/s)",
+       y = "Density") +
+  mytheme
+```
+
+
+::::::
+:::::: {.column}
+
+::: {.r-fit-text}
+
+The **sample mean** is a good candidate as the estimate.
+
+:::
+
+
++  `r format(round(299000 + mean(speed_of_light)), big.mark = " ")` km/s is the <span class="accent-one">sample mean</span> of the observations.
++  299\ 792 km/s is the <span class="accent-three">actual</span> speed of light in vacuum.
+
+::: {.note}
+
+After adjusting for bending of light in the air, Michelson first estimated 299\ 940 km/s (1882) then improved the adjustment method to estimate 299\ 796 km/s.
+
+:::
+
+::: {.note}
+
+Actually, the meter is defined as the length of the path light travels in vacuum in ${\frac{1}{299\ 792\ 458}}$ of a second.
+
+:::
+
+::::::
+:::::::
+
+## Example: Variance of speed of light measurements
+
+:::::::: {.columns}
+::::::: {.column}
+
+The speed of light in a vacuum is now defined as exactly
+299 792.458 km/s. 
+
+Let $X_i\overset{i.i.d}{\sim}F_{\theta}$ for
+$i=1,\ldots,n$ represent speed of light measurements in km/s
+where $\theta=(\mu, \sigma^2)$.
+$\mu=299\ 792.458$ is the mean and $\sigma^2$ is the unknown variance
+of the measurements.
+
+
+:::::::
+::::::: {.column}
+
+
+Suppose we estimate the true variance $\sigma^2$ with
+
+$$\widetilde{s}_n^2=\frac{1}{n}\sum_{i=1}^{n}(X_i-\mu)^2.$$
+
+Show that $\widetilde{s}_n^2\overset{p}{\to}\sigma^2$. 
+
+What extra conditions are required on $X_i$?
+
+
+:::::::
+::::::::
+
+## Example: Variance of speed of light measurements
+
+::::: {.columns}
+:::: {.column}
+
+::: {.note}
+
+$X_i$'s are i.i.d random variables.
+
+$\implies (X_i-\mu)^2$  are i.i.d r.v.s.
+
+$\implies\widetilde{s}_n^2$ is a sample mean.
+
+:::
+::::
+:::: {.column}
+
+::: {.note}
+Required conditions for the LLN:
+
+1.  $\mathbb{E}\left[\left(X_i-\mu\right)^2\right]=\sigma^2<\infty$
+2.  $\text{Var}\left[\left(X_i-\mu\right)^2\right]<\infty$
+
+:::
+::::
+:::::
+
+<hr />
+
+Then, $\widetilde{s}_n^2$ converges in probability to the mean of $(X_1-\mu)^2$.
+
+$$\begin{split}
+& \mathbb{E}\left[\left(X_1-\mu\right)^2\right]\\
+=& \mathbb{E}\left[X_1^2-2\mu X_1+\mu^2\right] \\
+=& \mathbb{E}\left[X_1^2\right]-2\mu \mathbb{E}\left[X_1\right]+\mu^2 \\
+=& \mathbb{E}\left[X_1^2\right]-\mathbb{E}\left[X_1\right] & (\mathbb{E}(X_1)=\mu) \\
+=& \text{Var}(X_1) & (\text{Var}(X)=\mathbb{E}(X^2) - \left[\mathbb{E}(X)\right]^2\text{ for any r.v. }X)\\
+=& \sigma^2
+\end{split}$$
+    
+$$\implies\widetilde{s}_n^2\overset{p}{\to}\sigma^2$$
+
+## Exercises
+
+_(See Section 17.2 from Dekking et al.)_
+
+::::: {.columns}
+:::: {.column}
+
+Let $Y_1$, $Y_2$, ..., $Y_n$ be a random sample from a cumulative distribution
+function $F$ and let $F_n$ be the empirical distribution function. 
+
+$$F_n(a)=\frac{\text{number of }Y_i\text{ in }(-\infty,a]}{n}$$
+
+Let $G_a=F(a)$ and $G_{n,a}=F_n(a)$ for some constant $a$. Show that
+$G_{n,a}\overset{p}{\to}G_a$.
+
+::::
+:::: {.column}
+
+
+::::
+:::::
+
+
+## Exercises
+
+_(See Section 17.2 from Dekking et al.)_
+
+::::: {.columns}
+:::: {.column}
+
+
+Let $Y_1$, $Y_2$, ..., $Y_n$ be a random sample from a cumulative distribution
+function $F$ and let $F_n$ be the empirical distribution function. 
+
+$$F_n(a)=\frac{\text{number of }Y_i\text{ in }(-\infty,a]}{n}$$
+
+Let $G_a=F(a)$ and $G_{n,a}=F_n(a)$ for some constant $a$. Show that
+$G_{n,a}\overset{p}{\to}G_a$.
+
+
+::::
+:::: {.column}
+
+::: {.note}
+
+$$\mathbb{1}_{A}(x)=\mathbb{1}_{\{x\in A\}}=\begin{cases}1 & x\in A\\ 0 &\text{otherwise}\end{cases}$$
+
+is called an indicator function.
+
+:::
+
+::: {.note}
+
+To estimate the full distribution using this method, you need to repeat the 
+process for every possible value of $a$.
+
+:::
+
+::::
+:::::
+
+## Example: Estimating probabilities via simulation
+
+::::: {.columns}
+:::: {.column}
+
+<b class="accent-three">ECDF</b> 50 simulated values vs. 
+<b class="accent-five">CDF</b> of Exp(1)
+
+```{r}
+#| echo: false
+#| fig-asp: .8
+
+set.seed(3264)
+sim <- rexp(50, 1)
+
+ggplot() +
+  theme_minimal() +
+  annotate(
+    "segment",
+    x = c(0.5, 0.5), xend = c(0.5, 0),
+    y = c(0, mean(sim < .5)), yend = c(mean(sim < .5), mean(sim < .5)),
+    linetype = "dotted", linewidth = 1.5
+  ) +
+  geom_function(fun = pexp, colour = cmap[5], linewidth = 1.5, alpha = .7) +
+  geom_step(aes(x = sim), stat = "ecdf", colour = cmap[3], linewidth = 2) +
+  scale_y_continuous(breaks = c(0, mean(sim < .5), 1)) +
+  scale_x_continuous(breaks = c(.5)) +
+  labs(x = NULL, y = NULL) +
+  mytheme
+
+```
+
+::::
+:::: {.column}
+
+```{r eval=FALSE, echo=TRUE}
+sim <- rexp(50)
+```
+
+
+
++  Sample proportion of values less than any value $x$ is a sample mean of
+$$\mathbb{1}_{\{X_i< x\}}$$
+
++  The sample proportion converges to the probability that the population random 
+variable is less than $x$.
+
+```{r echo=TRUE}
+pexp(0.5)
+```
+
++  WLLN justifies using ECDF as an approximation of the CDF.
+
+
+::::
+:::::
+
+
+## Example: Estimating probabilities via simulation
+
+::::: {.columns}
+:::: {.column}
+
+<b class="accent-three">Density histogram</b> 50 simulated values vs. 
+<b class="accent-five">PDF</b> of Exp(1)
+
+```{r}
+#| echo: false
+#| fig-asp: .8
+
+ggplot() +
+  theme_minimal() +
+  geom_histogram(aes(x = sim, y = after_stat(density)), fill = cmap[3], bins = 15) +
+  geom_function(fun = dexp, colour = cmap[5], linewidth = 1.5, alpha = .7) +
+  geom_vline(aes(xintercept = mean(sim)), linetype = "dotted", linewidth = 1.5) +
+  scale_y_continuous(breaks = NULL) +
+  scale_x_continuous(breaks = mean(sim), labels = round(mean(sim), 3)) +
+  labs(x = NULL, y = NULL) +
+  mytheme
+
+```
+
+::::
+:::: {.column}
+
+```{r eval=FALSE, echo=TRUE}
+sim <- rexp(50)
+```
+
++  We can, of course, use the sample mean of simulated values to estimate the 
+population mean.
+
+```{r echo=TRUE}
+mean(sim) 
+```
+
++  WLLN justifies such approximations, especially, as you increase the sample size.
+
+```{r, echo=TRUE}
+mean(rexp(100))
+```
+
+::::
+:::::
+
+## Example: Estimating probabilities via simulation
+
+::::: {.columns}
+:::: {.column}
+
+<b class="accent-three">Density histogram</b> 1000 simulated values vs. 
+<b class="accent-five">PDF</b> of Exp(1)
+
+```{r}
+#| echo: false
+#| fig-asp: .8
+sim <- rexp(1000)
+ggplot() +
+  theme_minimal() +
+  geom_histogram(aes(x = sim, y = after_stat(density)), fill = cmap[3], bins = 30) +
+  geom_function(fun = dexp, colour = cmap[5], linewidth = 1.5, alpha = .7) +
+  geom_vline(aes(xintercept = mean(sim)), linetype = "dotted", linewidth = 1.5) +
+  scale_y_continuous(breaks = NULL) +
+  scale_x_continuous(breaks = mean(sim), labels = round(mean(sim), 3)) +
+  labs(x = NULL, y = NULL) +
+  mytheme
+
+```
+
+::::
+:::: {.column}
+
+```{r eval=FALSE, echo=TRUE}
+sim <- rexp(1000)
+```
+
++  WLLN justifies such approximations, especially, as you increase the sample size.
+
+```{r, echo=TRUE}
+mean(sim)
+```
+
+::::
+:::::
+
+## Exercises
+
+
+<div style="float:left; width: 30%">
+![](img/bluejays-retro.png "Toronto Blue Jays logo")
+<p class="text-tiny">Source: Captured from Toronto Blue Jays Twitter (@BlueJays)</p>
+</div>
+
+<div style="float: left; width: 70%; display: block;">
+Toronto Blue Jays won 94 games out of 162 regular season games during 
+the 2025 MLB season. 
+
+
+Assuming the number of wins in the 2026 season follows
+**the same binomial distribution** as the number of wins in the 2025 season, 
+what is the probability that the Leafs win more than 100 games in 2025?
+</div>
+
+## Exercises
+
+
+<div style="float:left; width: 30%">
+![](img/bluejays-retro.png "Toronto Blue Jays logo")
+<p class="text-tiny">Source: Captured from Toronto Blue Jays Twitter (@BlueJays)</p>
+</div>
+
+<div style="float: left; width: 70%; display: block;">
+Toronto Blue Jays won 94 games out of 162 regular season games during 
+the 2025 MLB season. 
+
+
+Assuming the number of wins in the 2026 season follows
+**the same binomial distribution** as the number of wins in the 2025 season, 
+what is the probability that the Leafs win more than 100 games in 2025?
+
+Do you see any issues with the model?
+
+
+<div class="note">
+
++  This is an example of a parametric model --- however unrealistic.
++  Estimating the parameter(s) fully estimates the parametric models.
+
+</div>
+</div>
+
+## Sample statistics and distribution features
+
+_(Table 17.2 from Dekking et al.)_
+
+:::::: {.columns}
+::::: {.column}
+
+### Sample statistic
+
+:::::
+::::: {.column}
+
+### Distribution feature
+
+:::::
+::::::
+
+:::::: {.columns}
+::::: {.column}
+
+**_Graphical_**
+
+Empirical cumulative distribution function
+
+Kernel density estimate and histogram
+
+:::::
+::::: {.column}
+
+**_Functions_**
+
+Cumulative distribution function
+
+Probability density function and mass function
+
+:::::
+::::::
+
+## Sample statistics and distribution features
+
+_(Table 17.2 from Dekking et al.)_
+
+:::::: {.columns}
+::::: {.column}
+
+### Sample statistic
+
+:::::
+::::: {.column}
+
+### Distribution feature
+
+:::::
+::::::
+
+:::::: {.columns}
+::::: {.column}
+
+**_Numerical_**
+
+Sample mean
+
+Sample median
+
+Empirical quantile
+
+Sample variance
+
+Sample standard deviation
+
+Median absolute deviation
+
+:::::
+::::: {.column}
+
+**_Parameters_**
+
+Expectation
+
+Median
+
+Quantile
+
+Variance
+
+Standard deviation
+
+$F^{\text{inv}}(0.75)-F^{\text{inv}}(0.5)$, for symmetric $F$<sup>&#8225;</sup>
+
+::: {.in-column-footer}
+<sup>&#8225;</sup>See Section 17.2 from Dekking et al.
+:::
+
+:::::
+::::::
+
+
+
+# Summary {.half-title .center}
+
+::::: {.full-height .right .incremental}
+
++  **Statistical models** describe observed data as realizations of
+unknown data-generating processes using probability distributions.
+
++  With prior knowledge about the process, we can assumptions to build choose 
+a probability distribution and partially specify a model.
+
++  The law of large numbers allows us to estimate features of model 
+distributions using sample statistics.
+
+:::::
