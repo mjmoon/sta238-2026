@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/tabby.min.js"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.36">
+
+  <meta name="author" content="Michael Jongho Moon">
+  <title>Week 12: Bayesian Estimation and Credible Intervals</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="index_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="index_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="index_files/libs/revealjs/dist/theme/quarto-a8b317dacf28a233254c3269f69e190f.css">
+  <link rel="stylesheet" href="style.css">
+  <link href="index_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="index_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="index_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="index_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="index_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="index_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Week 12: Bayesian Estimation and Credible Intervals</h1>
+  <p class="subtitle">STA238: Probability, Statistics, and Data Analysis II</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Michael Jongho Moon 
+</div>
+        <p class="quarto-title-affiliation">
+            March 26, 2026
+          </p>
+    </div>
+</div>
+
+</section>
+<section id="conjugate-priors" class="slide level2 half-title center">
+<h2>Conjugate priors</h2>
+<div class="column" style="width:45%;">
+<div class="note text-small">
+<p>We will discussion the normal-normal pair and beta-binomial pairs.</p>
+</div>
+<div class="note text-small">
+<p>While conjugate priors provide computational convenience, you do not need to restrict Bayesian models to conjugate pairs.</p>
+</div>
+</div><div class="full-height right">
+<p><br></p>
+<div class="definition">
+<p>We say that a prior distribution <span class="math inline">\(p(\theta)\)</span> is a <strong>conjugate prior</strong> for a statistical model <span class="math inline">\(p(\textbf x|\theta)\)</span> if the posterior distribution <span class="math inline">\(p(\theta|\textbf x)\)</span> is from the same probability distribution family as the prior distribution.</p>
+</div>
+</div>
+</section>
+<section id="normal-normal-model" class="slide level2">
+<h2>Normal-normal model</h2>
+<div class="columns">
+<div class="column">
+<div class="text-small">
+<p>The following pair</p>
+<hr>
+<div class="text-center">
+<p><strong>Data model</strong></p>
+<p><span class="math display">\[X_1,\ldots,X_n |\theta \overset{\text{i.i.d}}{\sim} N(\theta, \sigma^2)\]</span></p>
+<p><strong>Prior</strong></p>
+<p><span class="math display">\[\theta \sim N(\phi, \tau^2)\]</span></p>
+</div>
+<hr>
+<p>leads to</p>
+<hr>
+<div class="text-center">
+<p><strong>Posterior distribution</strong></p>
+<p><span class="math display">\[\theta|\mathbf{x}
+\sim N\left(
+\phi \frac{\sigma^2}{n\tau^2+\sigma^2} + \overline{x}_n\frac{n\tau^2}{n\tau^2+\sigma^2},
+\frac{\tau^2\sigma^2}{n\tau^2 + \sigma^2}\right)\]</span></p>
+</div>
+<hr>
+</div>
+</div><div class="column">
+<div class="text-small">
+<ul>
+<li><p>The posterior mean is the weighted average between the sample mean and the prior mean</p></li>
+<li><p>This is generally true in Bayesian updates; the Beta-binomial model is also shifts the posterior mean towards the sample mean of the proportion</p></li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="example-commute-time" class="slide level2">
+<h2>Example: Commute time</h2>
+<div class="columns">
+<div class="column" style="width:30%;">
+<div class="text-small">
+<p>Jane plans to ride her bike to her new job everyday along a bike trail. She is interested in her mean commute time to work by bike and models it as <span class="math inline">\(T\sim{N}(\theta, 5^2)\)</span> in minutes. Jane is 90% certain that her average commute time would be between 35 and 45 minutes. She measures her commute time for a week as shown below.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top">
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">36</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Estimate the mean commute time using a normal-normal Bayesian model.</p>
+</div>
+</div><div class="column" style="width:40%;">
+<div class="text-small">
+<p><strong>Prior</strong></p>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-2-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">qnorm</span>(<span class="fl">0.95</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.644854</code></pre>
+</div>
+</div>
+</div><div class="column" style="width:30%;">
+<div class="text-small">
+<p><span class="math inline">\(z_{0.05} = \text{_________}\)</span></p>
+<p><span class="math inline">\(\phi = \text{_________}\)</span></p>
+<p><span class="math inline">\(\tau = \text{_________}\)</span></p>
+</div>
+</div></div>
+</section>
+<section id="example-commute-time-1" class="slide level2">
+<h2>Example: Commute time</h2>
+<div class="columns">
+<div class="column" style="width:30%;">
+<div class="text-small">
+<p>Jane plans to ride her bike to her new job everyday along a bike trail. She is interested in her mean commute time to work by bike and models it as <span class="math inline">\(T\sim{N}(\theta, 5^2)\)</span> in minutes. Jane is 90% certain that her average commute time would be between 35 and 45 minutes. She measures her commute time for a week as shown below.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top">
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">36</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Estimate the mean commute time using a normal-normal Bayesian model.</p>
+</div>
+</div><div class="column" style="width:70%;">
+<div class="text-small">
+<p><strong>Prior</strong></p>
+<p><span class="math display">\[\theta \sim N(40, 3^2)\]</span></p>
+<p><strong>Data model</strong></p>
+<p><span class="math display">\[T_1,\ldots,T_5 | \theta \overset{\text{i.i.d}}{\sim} N(\theta, 5^2)\]</span></p>
+<p><strong>Posterior</strong></p>
+<p><span class="math display">\[\theta | \textbf{t} \sim N\left(
+\text{___} \frac{\phantom{aaaaaaaaaa}}{n\tau^2 + \sigma^2} +
+\text{___} \frac{\phantom{aaaaaaaaaa}}{n\tau^2 + \sigma^2},
+\frac{\phantom{aaaaaaaaaa}}{n\tau^2 + \sigma^2}
+\right)\]</span></p>
+</div>
+</div></div>
+</section>
+<section id="example-commute-time-2" class="slide level2">
+<h2>Example: Commute time</h2>
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-5-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column">
+<div class="text-small">
+<p><strong>Posterior</strong></p>
+<p><span class="math display">\[\theta|\mathbf{t} \sim {N}\left(42, 3.2\right)\]</span></p>
+<ul>
+<li>The expected mean of the posterior is 42.</li>
+<li>How about an interval estimate? What is a reasonable range of possible values for <span class="math inline">\(\theta\)</span> based on the posterior?</li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="credible-interval" class="slide level2 half-title center">
+<h2>Credible interval</h2>
+<div class="column" style="width:45%;">
+<div class="note text-small">
+<p>A credible interval doesn’t need to be in the middle; an off-middle interval may represent the most plausible range better when the distribution is skewed.</p>
+</div>
+</div><div class="full-height right">
+<p><br></p>
+<div class="definition text-small">
+<p>A posterior <strong>credible interval</strong> provides a range of plausible values of a parameter based on its posterior distribution. A <span class="math inline">\(p\)</span>% credible interval is any interval such that the posterior probability of the parameter falling within the interval is <span class="math inline">\(p\)</span>%.</p>
+<p>For example, the 2.5th and 97.5th posterior percentile is a middle 95% credible interval.</p>
+</div>
+</div>
+</section>
+<section id="example-commute-time-3" class="slide level2">
+<h2>Example: Commute time</h2>
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-6-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column">
+<div class="text-small">
+<p><strong>Posterior</strong></p>
+<p><span class="math display">\[\theta|\mathbf{t} \sim {N}\left(42, 3.2\right)\]</span></p>
+<p>To construct a 90% credible interval for <span class="math inline">\(\theta\)</span>, we need to find <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> such that</p>
+<p><span class="math display">\[P(a &lt; \theta &lt; b | \mathbf{t}) = 0.9\]</span></p>
+</div>
+</div></div>
+</section>
+<section>
+<section id="example-gpt-detector" class="title-slide slide level1 half-title center">
+<h1>Example:<br>GPT detector</h1>
+<div class="full-height right">
+<div class="in-column-tiny">
+<blockquote>
+<p>Leo, the Bayesian hero, and Florence, the frequentist hero, were called to investigate a string of mysterious disappearances in Data City. Florence analyzed past reports, finding that most cases happened near the old clock tower, while Leo updated his beliefs after noticing fresh footprints leading to the abandoned library. Combining their methods, they set a trap, caught the mastermind, and proved that logic—whether past trends or evolving evidence—always leads to the truth!</p>
+</blockquote>
+</div>
+<div class="in-column-footer">
+<p>Generated by ChatGPT 4 with prompt <em>Make a 3-sentence story about “Leo”, a Bayesian hero and “Florence”, a frequentist hero.</em> followed by <em>Tell me a story that is not about a coin.</em> https://chat.openai.com/</p>
+</div>
+</div>
+</section>
+<section id="the-detecotor" class="slide level2">
+<h2>The detecotor</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<p>Suppose an AI company boasts its algorithm can detect whether an essay is written by a generative AI (e.g., ChatGPT) or by a person with a 99% accuracy.</p>
+<p>You want to check whether the accuracy rate holds true for writings by non-native English writers. You collect writings from independent non-native writers and test the algorithm.</p>
+</div><div class="column" style="width:40%;">
+
+</div></div>
+</section>
+<section id="priors" class="slide level2 center">
+<h2>Priors</h2>
+<p>Suppose…</p>
+<div class="columns">
+<div class="column" style="width:25%;">
+<div class="text-small">
+<p>you tend to believe it will perform well but not 100% sure.</p>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p>you are 100% certain it will its success rate will be at least 50%.</p>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p>you don’t believe the company’s claim and not sure how well it will perform.</p>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p>you don’t believe the company’s claim and it will perform around 50-50.</p>
+</div>
+</div></div>
+<div class="columns">
+<div class="column" style="width:25%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-7-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-8-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-9-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-10-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="data-and-model" class="slide level2 center">
+<h2>Data and model</h2>
+<div class="columns">
+<div class="column" style="width:30%;">
+<p><strong>Data</strong></p>
+<div class="text-center">
+<p>Correct<br>Correct<br>Incorrect<br>Incorrect<br>Incorrect</p>
+</div>
+</div><div class="column" style="width:70%;">
+<p><strong>Data model</strong></p>
+<p><span class="math display">\[Y\sim\text{Binom}(n = 5, \theta)\]</span></p>
+<p>where <span class="math inline">\(Y\)</span> is the number of correct results by the detector.</p>
+</div></div>
+</section>
+<section id="likelihood" class="slide level2 center">
+<h2>Likelihood</h2>
+<div class="columns">
+<div class="column" style="width:30%;">
+<div class="text-small">
+<p><span class="math display">\[p(y|\theta)\propto \theta^{y}(1-\theta)^{5 - y}\]</span></p>
+</div>
+</div><div class="column" style="width:5%;">
+
+</div><div class="column" style="width:65%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-13-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="posterior" class="slide level2 center">
+<h2>Posterior</h2>
+<div class="columns">
+<div class="column" style="width:25%;">
+<div class="text-small">
+<p>you believed it will perform well but not 100% sure.</p>
+<p><span class="math display">\[\theta\sim\text{Beta}(4,1)\]</span></p>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p>you were 100% certain it will its success rate will be at least 50%.</p>
+<p><span class="math display">\[\theta\sim ?\]</span></p>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p>you didn’t believe the company’s claim and not sure how well it will perform.</p>
+<p><span class="math display">\[\theta\sim\text{Beta}(1,1)\]</span></p>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p>you didn’t believe the company’s claim and it will perform around 50-50.</p>
+<p><span class="math display">\[\theta\sim\text{Beta}(15,15)\]</span></p>
+</div>
+</div></div>
+<div class="columns">
+<div class="column" style="width:25%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-15-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-16-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-17-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-18-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+<div class="columns">
+<div class="column" style="width:25%;">
+<div class="text-small">
+<p><span class="math display">\[\theta|y\sim\text{Beta}(6,4)\]</span></p>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p><span class="math display">\[\theta|y\sim ?\]</span></p>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p><span class="math display">\[\theta|y\sim\text{Beta}(3,4)\]</span></p>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p><span class="math display">\[\theta|y\sim\text{Beta}(17,18)\]</span></p>
+</div>
+</div></div>
+</section>
+<section id="grid-approximation" class="slide level2 center">
+<h2>Grid approximation</h2>
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a>theta_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">501</span>) <span class="co"># 101 grid points</span></span>
+<span id="cb3-2"><a href=""></a>likelihood <span class="ot">&lt;-</span> <span class="fu">dbinom</span>(y, <span class="dv">5</span>, theta_grid)</span>
+<span id="cb3-3"><a href=""></a></span>
+<span id="cb3-4"><a href=""></a>prior <span class="ot">&lt;-</span> </span>
+<span id="cb3-5"><a href=""></a>  </span>
+<span id="cb3-6"><a href=""></a>posterior_unst <span class="ot">&lt;-</span> likelihood <span class="sc">*</span> prior</span>
+<span id="cb3-7"><a href=""></a>posterior <span class="ot">&lt;-</span> posterior_unst <span class="sc">/</span> <span class="fu">sum</span>(posterior_unst)</span>
+<span id="cb3-8"><a href=""></a></span>
+<span id="cb3-9"><a href=""></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb3-10"><a href=""></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> theta_grid, <span class="at">y =</span> posterior))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div><div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-20-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+<div class="note">
+<p>Provides a discretized approximation of the posterior distribution.</p>
+</div>
+</section>
+<section id="grid-approximation-1" class="slide level2 center">
+<h2>Grid approximation</h2>
+<div class="columns">
+<div class="column" style="width:25%;">
+<div class="text-small">
+<p><strong>Grid with 5 points</strong></p>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-22-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p><strong>Grid with 11 points</strong></p>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-23-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p><strong>Grid with 101 points</strong></p>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-24-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:25%;">
+<div class="text-small">
+<p><strong>Grid with 501 points</strong></p>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-25-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="detectors-in-real-world" class="slide level2 center">
+<h2>Detectors in real world…</h2>
+<p><em>“GPT detectors are biased against non-native English writers”</em></p>
+<p>by Liang, Yuksekgonul, Mao, Wu &amp; Zou published in <em>Pattern</em>, 4(7), July 2023. <a href="https://doi.org/10.1016/j.patter.2023.100779">https://doi.org/10.1016/j.patter.2023.100779</a></p>
+</section></section>
+<section>
+<section id="a-case-study-uk-gender-pay-gap-among-higher-education-employees" class="title-slide slide level1 center">
+<h1>A case study: UK gender pay gap among Higher Education Employees</h1>
+<div class="in-column-footer">
+<p>Data retrieved from <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-06-28">Tidytuesday</a>; original source at <a href="https://gender-pay-gap.service.gov.uk/viewing/download">https://gender-pay-gap.service.gov.uk/</a>.</p>
+</div>
+</section>
+<section id="uk-gender-pay-gap-data" class="slide level2 center">
+<h2>UK gender pay gap data</h2>
+<div class="columns">
+<div class="column">
+<div class="text-small">
+<ul>
+<li><p>In the UK, employers with 250 or more employees are required to report gender pay gap data annually.</p></li>
+<li><p>They measure gender pay gap as percentage difference in median hourly wages among men minus those among women as shown on the right.</p></li>
+<li><p>We will look at the pay gap data reported by higher education employers (e.g., universities) in 2022 to estimate the mean gender pay gap in higher education.</p></li>
+</ul>
+</div>
+</div><div class="column">
+<p><br></p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="img/GPG-formula.png" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="in-column-footer">
+<p>Image from <a href="https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/articles/testyourknowledgeonthegenderpaygap/2016-12-09">UK Office for National Statistics</a>.</p>
+</div>
+</div></div>
+</section>
+<section id="model" class="slide level2">
+<h2>Model</h2>
+<div class="columns">
+<div class="column">
+<h3 id="data-model">Data model</h3>
+<p><span class="math display">\[D_1, D_2,\ldots,D_n\overset{i.i.d}\sim {N}(\mu, \sigma^2)\]</span></p>
+<div class="note">
+<p>The sample standard deviation has been approximately 10 in the past few years. For simplicity, we will consider it as the known population standard deviation, <span class="math inline">\(\sigma=10\)</span>.</p>
+</div>
+</div><div class="column">
+<h3 id="prior">Prior</h3>
+<p><span class="math display">\[\mu\sim{N}(\phi, \tau^2)\]</span></p>
+<div class="note">
+<ul>
+<li>Let’s be optimistic about the higher education industry and expect no difference on average. <span class="math display">\[\implies \phi=0\]</span></li>
+<li>However, let’s not assume it’s impossible to observe a large difference and allow differences as large as XX% in both directions.</li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="possible-priors" class="slide level2">
+<h2>Possible priors</h2>
+<div class="cell quarto-layout-panel" data-layout-ncol="3">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-28-1.png" width="960"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-28-2.png" width="960"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-28-3.png" width="960"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="possible-priors-1" class="slide level2">
+<h2>Possible priors</h2>
+<div class="cell quarto-layout-panel" data-layout-ncol="3">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-29-1.png" width="960"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-29-2.png" width="960"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-29-3.png" width="960"></p>
+</div>
+</div>
+</div>
+<div class="note">
+<p>I wouldn’t expect the average difference to be more than 50% in either direction.<br>
+Let’s use <span class="math inline">\(\mu\sim{N}(0, 20^2)\)</span>.</p>
+</div>
+</section>
+<section id="data" class="slide level2">
+<h2>Data</h2>
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-30-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a>paygap</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 19.0  9.8 -9.3 -0.8  0.6 -3.4 14.6 16.1 11.8  8.5  7.8  3.0</code></pre>
+</div>
+</div>
+</div><div class="column">
+<ul>
+<li>There are <span class="math inline">\(n=\)</span> 12 values.</li>
+<li>The values range between -9.3 and 19.</li>
+<li>The sample mean of the data is 6.475.</li>
+</ul>
+</div></div>
+</section>
+<section id="posterior-1" class="slide level2">
+<h2>Posterior</h2>
+<div class="text-small">
+<ul>
+<li>Recall that the posterior distribution for the normal-normal model is</li>
+</ul>
+<p><span class="math display">\[{N}\left(\phi\frac{\sigma^2}{n\tau^2+\sigma^2}+\overline{d}_n\frac{n\tau^2}{n\tau^2+\sigma^2}, \frac{\tau^2\sigma^2}{n\tau^2 + \sigma^2}\right)\]</span> where <span class="math inline">\(\overline{d}_n\)</span> is the mean difference observed in the data.</p>
+<ul>
+<li>Therefore, the posterior distribution for the mean percentage difference in median hourly wage is</li>
+</ul>
+<p><br></p>
+<p><span class="math display">\[{N}{\Biggl(}\text{___________________}, \text{____________}{\Biggr)}\]</span></p>
+</div>
+</section>
+<section id="estimates" class="slide level2">
+<h2>Estimates</h2>
+<p><span class="math display">\[\mu|\mathbf{d}
+\sim{N}\left(
+\frac{6.475\cdot 12\cdot 20^2}{12\cdot20^2 + 10^2},
+\frac{20^2\cdot 10^2}{12\cdot20^2 + 10^2}\right)\]</span></p>
+<div class="columns">
+<div class="column">
+<h3 id="posterior-mean">Posterior mean</h3>
+<p><span class="math display">\[\mathbb{E}(\mu|\mathbf{d})=\frac{1554}{245}\]</span></p>
+<h3 id="credible-interval-1">95% credible interval</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a><span class="fu">c</span>(<span class="fu">qnorm</span>(.<span class="dv">025</span>, <span class="dv">1554</span><span class="sc">/</span><span class="dv">245</span>, <span class="fu">sqrt</span>(<span class="dv">400</span><span class="sc">/</span><span class="dv">49</span>)), </span>
+<span id="cb6-2"><a href=""></a>  <span class="fu">qnorm</span>(.<span class="dv">975</span>, <span class="dv">1554</span><span class="sc">/</span><span class="dv">245</span>, <span class="fu">sqrt</span>(<span class="dv">400</span><span class="sc">/</span><span class="dv">49</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  0.74296 11.94275</code></pre>
+</div>
+</div>
+<p><span class="math display">\[(0.743, 11.943)\]</span></p>
+</div><div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-33-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="what-about-the-frequentist-estimates" class="slide level2">
+<h2>What about the frequentist estimates?</h2>
+<div class="columns">
+<div class="column">
+<h3 id="point-estimate">Point estimate</h3>
+<p>The maximum likelihood estimate is the sample mean,</p>
+<p><span class="math display">\[\overline{d}_n= 6.475 \]</span></p>
+</div><div class="column">
+<h3 id="interval-estimate">Interval estimate</h3>
+<p>The 95% confidence interval is</p>
+<p><span class="math display">\[\left(\overline{d} - z_{0.025} \frac{\sigma}{\sqrt{n}}, \overline{d} + z_{0.025} \frac{\sigma}{\sqrt{n}}\right)\]</span></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a><span class="fu">mean</span>(paygap) <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">qnorm</span>(.<span class="dv">975</span>) <span class="sc">*</span> <span class="dv">10</span> <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  0.8170713 12.1329287</code></pre>
+</div>
+</div>
+<p><span class="math display">\[=(0.817, 12.133)\]</span></p>
+</div></div>
+</section>
+<section id="common-features-of-the-two-intervals" class="slide level2">
+<h2>Common features of the two intervals</h2>
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-35-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column">
+<div class="text-small">
+<ul>
+<li><p>With a large sample, the credible interval would shrink in width as the confidence interval does; and they both shrink towards the sample mean.</p></li>
+<li><p>They both provide a range of plausible values for an unknown parameter.</p></li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="difference-between-the-two-intervals" class="slide level2">
+<h2>Difference between the two intervals</h2>
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-36-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column">
+<div class="text-small">
+<ul>
+<li>Their key difference is the way they are interpreted.</li>
+<li>The <strong>credible interval</strong> is the range of the possible values of the parameter.</li>
+</ul>
+<blockquote>
+<p>There is a 90% probability <span class="math inline">\(\theta\)</span> is within in the interval.</p>
+</blockquote>
+<ul>
+<li>The <strong>confidence interval</strong> is the range which possibly <em>includes</em> a fixed true parameter value.</li>
+</ul>
+<blockquote>
+<p>If we repeatedly the interval in the same manner indefinitely, 90% of them will include the true parameter value.</p>
+</blockquote>
+</div>
+</div></div>
+</section>
+<section id="exercise" class="slide level2">
+<h2>Exercise</h2>
+<div class="columns">
+<div class="column">
+<div class="text-small">
+<p>Let’s model the average Grade 12 marks among new U of T Physical &amp; Mathematical Sciences undergraduate students with</p>
+<p><span class="math display">\[N(\mu, \sigma^2)\]</span></p>
+<p>with <span class="math inline">\(\sigma=7\)</span>.</p>
+<p>Let’s impose a normal prior on <span class="math inline">\(\mu\)</span>. What would be an reasonable prior?</p>
+</div>
+</div><div class="column">
+<p><span class="math display">\[\mu\sim N(87, 3^2)\]</span></p>
+<div class="in-column-footer">
+<p>Based on <a href="https://www.artsci.utoronto.ca/future/ready-apply/admission-categories/physical-mathematical-sciences#admission-requirements-accordion-3">this FAS page</a>, the approximate admission range is “mid to high 80s”.</p>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-37-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="exercise-1" class="slide level2">
+<h2>Exercise</h2>
+<div class="columns">
+<div class="column">
+<div class="text-small">
+<p><strong>Model</strong></p>
+<p><span class="math display">\[N(\mu, 7^2)\]</span></p>
+<p><strong>Prior</strong></p>
+<p><span class="math display">\[\mu\sim N(87, 3^2)\]</span></p>
+<p><strong>Data</strong></p>
+<p><span class="math display">\[90\quad 90\quad 90\quad 90\quad 90\]</span> <span class="math display">\[90\quad 90\quad 90\quad 90\quad 90\]</span> <span class="math display">\[90\quad 90\quad 90\quad 90\quad 90\]</span> <span class="math display">\[...\]</span></p>
+</div>
+</div><div class="column">
+<p><strong>Posterior</strong></p>
+<p><em>What happens to the posterior as you observe more data?</em></p>
+</div></div>
+</section>
+<section id="exercise-2" class="slide level2">
+<h2>Exercise</h2>
+<div class="columns">
+<div class="column">
+<div class="text-small">
+<p><strong>Model</strong></p>
+<p><span class="math display">\[N(\mu, 7^2)\]</span></p>
+<p><strong>Prior</strong></p>
+<p><span class="math display">\[\mu\sim N(87, 3^2)\]</span></p>
+<p><strong>Data</strong></p>
+<p><span class="math display">\[90\quad 90\quad 90\quad 90\quad 90\]</span> <span class="math display">\[90\quad 90\quad 90\quad 90\quad 90\]</span> <span class="math display">\[90\quad 90\quad 90\quad 90\quad 90\]</span> <span class="math display">\[...\]</span></p>
+</div>
+</div><div class="column">
+<p><strong>Posterior</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-39-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section></section>
+<section id="summary" class="title-slide slide level1 half-title center">
+<h1>Summary</h1>
+<div class="full-height right text-small">
+<ul>
+<li class="fragment">Priors are selected to represent prior knowledge/belief; there may be multiple ways to construct; allow positive probabilities for all possible values</li>
+<li class="fragment">Both frequentist and Bayesian inferences can provide point and interval estimates.</li>
+<li class="fragment">While the results may provide similar numeric estimates, the interpretations would be different since their assumptions about the parameters are different.</li>
+</ul>
+</div>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p>© 2026. Michael J. Moon. University of Toronto.</p>
+<p>Sharing, posting, selling, or using this material outside of your personal use in this course is <strong>NOT</strong> permitted under any circumstances.</p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="index_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="index_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="index_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="index_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="index_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="index_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="index_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="index_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="index_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="index_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="index_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
